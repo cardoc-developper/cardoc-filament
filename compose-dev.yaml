@@ -1,0 +1,76 @@
+name: "cardoc-dev"
+services:
+  # Cardoc
+  cardoc:
+    build:
+      context: ./services/cardoc
+      dockerfile: Dockerfile
+
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ./services/cardoc:/usr/local/cardoc
+      - /usr/local/cardoc/vendor/
+      - /usr/local/cardoc/node_modules/
+    ports:
+      - '${FORWARD_CARDOC_PORT:-80}:80'
+      - '${FORWARD_VITE_PORT:-5173}:${VITE_PORT:-5173}'
+
+    networks:
+      - cardoc
+    depends_on:
+      - redis
+      - mysql  # Laravel Api and dependant images
+
+  mysql:
+    image: mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: '${DB_ROOT_PASSWORD:-8100}:8100'
+      MYSQL_DATABASE: '${DB_DATABASE:-cardoc}'
+      MYSQL_USER: '${DB_USERNAME:-cardoc}'
+      MYSQL_PASSWORD: '${DB_PASSWORD:-password}'
+    ports:
+      - '${DB_FORWARD_PORT-3306}:3306'
+    volumes:
+      - 'cardoc-mysql:/var/lib/mysql'
+    networks:
+      - cardoc
+
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '${FORWARD_REDIS_PORT:-6379}:6379'
+    volumes:
+      - 'cardoc-redis:/data'
+    networks:
+      - cardoc
+    healthcheck:
+      test:
+        - CMD
+        - redis-cli
+        - ping
+      retries: 3
+      timeout: 5s
+
+  mailpit:
+    image: 'axllent/mailpit:latest'
+    ports:
+      - '${FORWARD_MAILPIT_PORT:-1025}:1025'
+      - '${FORWARD_MAILPIT_DASHBOARD_PORT:-8025}:8025'
+    networks:
+      - cardoc
+
+
+networks:
+  cardoc:
+    driver: bridge
+
+volumes:
+  cardoc-mysql:
+    driver: local
+
+  cardoc-redis:
+    driver: local
+
+
