@@ -2,14 +2,16 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Concerns\HasUlids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Vehicle extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUlids;
 
     protected $fillable = [
+        'name',
         'license_plate',
         'brand',
         'model',
@@ -24,5 +26,13 @@ class Vehicle extends Model
         'images',
         'attachments',
     ];
-    
+
+    protected $casts = [
+        'date_of_registration' => 'date',
+        'date_of_purchase' => 'date',
+        'mileage' => 'integer',
+        'images' => 'array',
+        'attachments' => 'array',
+    ];
+
 }

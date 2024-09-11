@@ -12,20 +12,26 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('vehicles', function (Blueprint $table) {
-            $table->id();
-            $table->string('license_plate')->nullable();
+            $table->ulid('id')
+                ->primary();
+
+            $table->string('name')->nullable();
+            $table->string('type');
             $table->string('brand');
             $table->string('model');
-            $table->string('type')->nullable();
-            $table->string('date_of_registration')->nullable();
-            $table->string('vin')->nullable();
+            $table->string('license_plate');
             $table->string('color')->nullable();
-            $table->string('mileage')->nullable();
-            $table->string('energy')->nullable();
+            $table->string('energy');
+
+            $table->string('date_of_registration')->nullable();
             $table->string('date_of_purchase')->nullable();
+            $table->string('vin')->nullable();
+            $table->string('mileage')->nullable();
             $table->string('number_of_owner')->nullable();
-            $table->string('images')->nullable();
-            $table->string('attachments')->nullable();
+
+            $table->text('images')->nullable();
+            $table->text('attachments')->nullable();
+
             $table->timestamps();
         });
     }
